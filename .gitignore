@@ -1,4 +1,5 @@
 *
 !.gitignore
 !.vscodeignore
-
+!README.md
+!LICENSE.md
