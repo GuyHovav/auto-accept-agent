@@ -53,5 +53,8 @@
     },
     "devDependencies": {
         "esbuild": "^0.27.1"
+    },
+    "optionalDependencies": {
+        "@esbuild/linux-x64": "^0.27.2"
     }
 }

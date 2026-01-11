@@ -20,7 +20,6 @@ var require_settings_panel = __commonJS({
   "settings-panel.js"(exports2, module2) {
     var vscode2 = require("vscode");
     var { STRIPE_LINKS } = require_config();
-    var LICENSE_API2 = "https://auto-accept-backend.onrender.com/api";
     var SettingsPanel2 = class _SettingsPanel {
       static currentPanel = void 0;
       static viewType = "autoAcceptSettings";
@@ -112,7 +111,7 @@ var require_settings_panel = __commonJS({
         }
       }
       isPro() {
-        return this.context.globalState.get("auto-accept-isPro", false);
+        return true;
       }
       getUserId() {
         let userId = this.context.globalState.get("auto-accept-userId");
@@ -651,21 +650,7 @@ var require_settings_panel = __commonJS({
         }
       }
       async checkProStatus(userId) {
-        return new Promise((resolve) => {
-          const https = require("https");
-          https.get(`${LICENSE_API2}/verify?userId=${userId}`, (res) => {
-            let data = "";
-            res.on("data", (chunk) => data += chunk);
-            res.on("end", () => {
-              try {
-                const json = JSON.parse(data);
-                resolve(json.isPro === true);
-              } catch (e) {
-                resolve(false);
-              }
-            });
-          }).on("error", () => resolve(false));
-        });
+        return true;
       }
       startPolling(userId) {
         let attempts = 0;
@@ -5463,7 +5448,6 @@ var FREQ_STATE_KEY = "auto-accept-frequency";
 var BANNED_COMMANDS_KEY = "auto-accept-banned-commands";
 var ROI_STATS_KEY = "auto-accept-roi-stats";
 var SECONDS_PER_CLICK = 5;
-var LICENSE_API = "https://auto-accept-backend.onrender.com/api";
 var INSTANCE_ID = Math.random().toString(36).substring(7);
 var isEnabled = false;
 var isPro = false;
@@ -5526,7 +5510,7 @@ async function activate(context) {
   }
   try {
     isEnabled = context.globalState.get(GLOBAL_STATE_KEY, false);
-    isPro = context.globalState.get(PRO_STATE_KEY, false);
+    isPro = context.globalState.get(PRO_STATE_KEY, true);
     if (isPro) {
       pollFrequency = context.globalState.get(FREQ_STATE_KEY, 1e3);
     } else {
@@ -6045,23 +6029,7 @@ function updateStatusBar() {
   }
 }
 async function verifyLicense(context) {
-  const userId = context.globalState.get("auto-accept-userId");
-  if (!userId) return false;
-  return new Promise((resolve) => {
-    const https = require("https");
-    https.get(`${LICENSE_API}/check-license?userId=${userId}`, (res) => {
-      let data = "";
-      res.on("data", (chunk) => data += chunk);
-      res.on("end", () => {
-        try {
-          const json = JSON.parse(data);
-          resolve(json.isPro === true);
-        } catch (e) {
-          resolve(false);
-        }
-      });
-    }).on("error", () => resolve(false));
-  });
+  return true;
 }
 async function handleProActivation(context) {
   log("Pro Activation: Starting verification process...");
